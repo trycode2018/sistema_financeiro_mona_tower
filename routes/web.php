@@ -60,40 +60,45 @@ Route::middleware(['auth'])->group(function () {
 
     /*
     |--------------------------------------------------------------------------
-    | Pagamentos (ACESSO DUPLO)
+    | Pagamentos - ESTRUTURA CORRIGIDA
     |--------------------------------------------------------------------------
     |
-    | 1. Acesso independente:
-    |       /payments
-    |       /payments/{payment}
+    | 1. Rotas independentes para listagem, visualização, edição e exclusão
+    | 2. Rotas aninhadas para criação via fatura específica
     |
-    | 2. Acesso por fatura:
-    |       /invoices/{invoice}/payments/create
-    |       /invoices/{invoice}/payments
-    |
-    |--------------------------------------------------------------------------
     */
 
-    // Acesso independente
-    Route::resource('payments', PaymentController::class);
+    // Rotas independentes de Pagamentos (SEM create/store)
+    Route::resource('payments', PaymentController::class)->except(['create', 'store']);
 
-    // Acesso via fatura
-    Route::get('invoices/{invoice}/payments/create', [PaymentController::class, 'create'])
-        ->name('invoices.payments.create');
-
-    Route::post('invoices/{invoice}/payments', [PaymentController::class, 'store'])
-        ->name('invoices.payments.store');
+    // Rotas aninhadas de Pagamentos via Faturas
+    Route::prefix('invoices/{invoice}')->group(function () {
+        // Criar pagamento para fatura específica
+        Route::get('/payments/create', [PaymentController::class, 'create'])
+            ->name('invoices.payments.create');
+        
+        // Armazenar pagamento para fatura específica  
+        Route::post('/payments', [PaymentController::class, 'store'])
+            ->name('invoices.payments.store');
+        
+        // Pagamento total automático
+        Route::post('/payments/full', [PaymentController::class, 'createFullPayment'])
+            ->name('invoices.payments.full');
+    });
 
     /*
     |--------------------------------------------------------------------------
     | Relatórios
     |--------------------------------------------------------------------------
     */
-    Route::get('/relatorios/financeiro', [ReportController::class, 'financial'])
-        ->name('reports.financial');
-
-    Route::get('/relatorios/estudantes', [ReportController::class, 'students'])
-        ->name('reports.students');
+    Route::prefix('relatorios')->group(function () {
+        Route::get('/financeiro', [ReportController::class, 'financial'])
+            ->name('reports.financial');
+        Route::get('/estudantes', [ReportController::class, 'students'])
+            ->name('reports.students');
+        Route::get('/faturas', [ReportController::class, 'invoices'])
+            ->name('reports.invoices');
+    });
 });
 
 // Autenticação Breeze

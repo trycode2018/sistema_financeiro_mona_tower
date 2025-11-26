@@ -54,7 +54,7 @@
                     </div>
                     <div>
                         <p class="text-sm font-medium text-gray-600">Receita Total</p>
-                        <p class="text-2xl font-semibold text-gray-900">MZN {{ number_format($totalRevenue, 2, ',', ' ') }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">Kz {{ number_format($totalRevenue, 2, ',', ' ') }}</p>
                     </div>
                 </div>
             </div>
@@ -129,54 +129,18 @@
             </div>
         </div>
 
-        <!-- Gráficos -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Receita Mensal (MZN)</h3>
-                <canvas id="revenueChart" width="400" height="200"></canvas>
-            </div>
-            
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Estado dos Pagamentos</h3>
-                <canvas id="paymentChart" width="400" height="200"></canvas>
-            </div>
-        </div>
-
-        <!-- Actividade Recente -->
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-                <div class="px-6 py-4 border-b border-gray-200">
-                    <h3 class="text-lg font-semibold text-gray-900">Pagamentos Recentes</h3>
+        <!-- Gráficos e Ações Rápidas -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Gráficos -->
+            <div class="lg:col-span-2 grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Receita Mensal (Kz)</h3>
+                    <canvas id="revenueChart" width="400" height="200"></canvas>
                 </div>
-                <div class="divide-y divide-gray-200">
-                    @forelse($recentPayments as $payment)
-                    <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center space-x-4">
-                                <div class="w-10 h-10 bg-school-light rounded-full flex items-center justify-center">
-                                    <svg class="w-5 h-5 text-school-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
-                                    </svg>
-                                </div>
-                                <div>
-                                    <p class="font-medium text-gray-900">{{ $payment->invoice->student->name }}</p>
-                                    <p class="text-sm text-gray-600">Fatura #{{ $payment->invoice->invoice_number }}</p>
-                                </div>
-                            </div>
-                            <div class="text-right">
-                                <p class="font-semibold text-gray-900">MZN {{ number_format($payment->amount, 2, ',', ' ') }}</p>
-                                <p class="text-sm text-gray-600">{{ $payment->payment_date->format('d/m/Y') }}</p>
-                            </div>
-                        </div>
-                    </div>
-                    @empty
-                    <div class="px-6 py-8 text-center text-gray-500">
-                        <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-                        </svg>
-                        <p class="mt-2">Nenhum pagamento recente</p>
-                    </div>
-                    @endforelse
+                
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Estado dos Pagamentos</h3>
+                    <canvas id="paymentChart" width="400" height="200"></canvas>
                 </div>
             </div>
 
@@ -204,6 +168,15 @@
                         <span class="font-medium">Adicionar Estudante</span>
                     </a>
                     
+                    <a href="{{ route('invoices.index') }}" class="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                        <div class="p-2 bg-green-100 text-green-600 rounded-lg">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                            </svg>
+                        </div>
+                        <span class="font-medium">Registrar Pagamento</span>
+                    </a>
+                    
                     <a href="{{ route('reports.financial') }}" class="flex items-center space-x-3 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
                         <div class="p-2 bg-purple-100 text-purple-600 rounded-lg">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -213,6 +186,43 @@
                         <span class="font-medium">Relatórios Financeiros</span>
                     </a>
                 </div>
+            </div>
+        </div>
+
+        <!-- Actividade Recente -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="px-6 py-4 border-b border-gray-200">
+                <h3 class="text-lg font-semibold text-gray-900">Pagamentos Recentes</h3>
+            </div>
+            <div class="divide-y divide-gray-200">
+                @forelse($recentPayments as $payment)
+                <div class="px-6 py-4 hover:bg-gray-50 transition-colors">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center space-x-4">
+                            <div class="w-10 h-10 bg-school-light rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-school-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="font-medium text-gray-900">{{ $payment->invoice->student->name ?? 'N/A' }}</p>
+                                <p class="text-sm text-gray-600">Fatura #{{ $payment->invoice->invoice_number }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-semibold text-gray-900">Kz {{ number_format($payment->amount, 2, ',', ' ') }}</p>
+                            <p class="text-sm text-gray-600">{{ $payment->payment_date->format('d/m/Y') }}</p>
+                        </div>
+                    </div>
+                </div>
+                @empty
+                <div class="px-6 py-8 text-center text-gray-500">
+                    <svg class="w-12 h-12 mx-auto text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <p class="mt-2">Nenhum pagamento recente</p>
+                </div>
+                @endforelse
             </div>
         </div>
     </div>
@@ -227,7 +237,7 @@
             data: {
                 labels: @json($revenueChart['labels']),
                 datasets: [{
-                    label: 'Receita Mensal (MZN)',
+                    label: 'Receita Mensal (Kz)',
                     data: @json($revenueChart['data']),
                     borderColor: 'rgb(59, 130, 246)',
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
@@ -247,7 +257,7 @@
                         beginAtZero: true,
                         ticks: {
                             callback: function(value) {
-                                return 'MZN ' + value.toLocaleString('pt-MZ');
+                                return 'Kz ' + value.toLocaleString('pt-MZ');
                             }
                         }
                     }

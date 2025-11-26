@@ -5,7 +5,7 @@
             <div class="w-10 h-10 bg-school-accent rounded-full flex items-center justify-center">
                 <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l9 5m-9-5v10"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9 5m-9-5v10"/>
                 </svg>
             </div>
             <span class="text-xl font-bold">Mona Tower</span>
@@ -49,12 +49,33 @@
             <span>Utilizadores</span>
         </a>
 
-        <a href="{{ route('reports.financial') }}" class="flex items-center space-x-3 px-4 py-3 rounded-lg {{ request()->routeIs('reports.*') ? 'bg-school-secondary text-white' : 'text-school-light hover:bg-school-secondary' }}">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-            </svg>
-            <span>Relatórios</span>
-        </a>
+        <!-- Item Principal de Relatórios -->
+        <div class="relative" x-data="{ open: false }">
+            <button @click="open = !open" class="flex items-center justify-between w-full px-4 py-3 rounded-lg {{ request()->routeIs('reports.*') ? 'bg-school-secondary text-white' : 'text-school-light hover:bg-school-secondary' }}">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                    <span>Relatórios</span>
+                </div>
+                <svg class="w-4 h-4 transition-transform" :class="{'rotate-180': open}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+            </button>
+
+            <!-- Submenu de Relatórios - AQUI VOCÊ COLA A DIV COMPLETA -->
+            <div x-show="open" class="pl-4 mt-2 space-y-1">
+                <a href="{{ route('reports.financial') }}" class="flex items-center space-x-3 px-4 py-2 rounded-lg {{ request()->routeIs('reports.financial') ? 'bg-school-secondary text-white' : 'text-school-light hover:bg-school-secondary' }} transition">
+                    <span class="text-sm">Financeiro</span>
+                </a>
+                <a href="{{ route('reports.students') }}" class="flex items-center space-x-3 px-4 py-2 rounded-lg {{ request()->routeIs('reports.students') ? 'bg-school-secondary text-white' : 'text-school-light hover:bg-school-secondary' }} transition">
+                    <span class="text-sm">Estudantes</span>
+                </a>
+                <a href="{{ route('reports.invoices') }}" class="flex items-center space-x-3 px-4 py-2 rounded-lg {{ request()->routeIs('reports.invoices') ? 'bg-school-secondary text-white' : 'text-school-light hover:bg-school-secondary' }} transition">
+                    <span class="text-sm">Faturas</span>
+                </a>
+            </div>
+        </div>
     </nav>
 
     <!-- User Info -->

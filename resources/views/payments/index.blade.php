@@ -5,6 +5,15 @@
                 <h1 class="text-2xl font-bold text-gray-900">Gestão de Pagamentos</h1>
                 <p class="text-gray-600">Lista de todos os pagamentos registados</p>
             </div>
+            <div class="flex space-x-2">
+                <!-- Botão para criar pagamento rápido -->
+                <a href="{{ route('invoices.index') }}" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition flex items-center space-x-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    <span>Novo Pagamento</span>
+                </a>
+            </div>
         </div>
     </x-slot>
 
@@ -52,7 +61,7 @@
                                 Valor
                             </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Acções
+                                Ações
                             </th>
                         </tr>
                     </thead>
@@ -63,7 +72,7 @@
                                 {{ $payment->reference ?? 'N/A' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{ $payment->invoice->student->name }}
+                                {{ $payment->invoice->student->name ?? 'N/A' }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {{ $payment->invoice->invoice_number }}
@@ -94,7 +103,7 @@
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                MZN {{ number_format($payment->amount, 2, ',', ' ') }}
+                                Kz {{ number_format($payment->amount, 2, ',', ' ') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                 <div class="flex items-center space-x-2">
