@@ -6,11 +6,24 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\HasAuditLog;
+use Illuminate\Notifications\Notifiable;
+use App\Models\Service;
 
 class Student extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAuditLog, Notifiable; // 2. Ativar o Trait dentro da classe dentro da classe
 
+    public function services()
+    {
+        return $this->belongsToMany(Service::class)
+            ->withPivot([
+                'start_date',
+                'end_date',
+                'status'
+            ])
+            ->withTimestamps();
+    }
     protected $fillable = [
         'student_code',
         'name',

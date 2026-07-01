@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('academic_year');
             $table->foreignId('guardian_id')->constrained()->onDelete('cascade');
             $table->boolean('transport_required')->default(false);
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }

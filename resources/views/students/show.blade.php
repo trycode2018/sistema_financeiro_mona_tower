@@ -2,113 +2,208 @@
     <x-slot name="header">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">{{ $student->name }}</h1>
-                <p class="text-gray-600">Detalhes do estudante</p>
+                <h1 class="text-2xl font-bold text-gray-900">
+                    {{ $student->name }}
+                </h1>
+
+                <p class="text-gray-600">
+                    Perfil completo do estudante
+                </p>
             </div>
-            <div class="flex space-x-2">
-                <a href="{{ route('students.edit', $student) }}" class="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition">
-                    Editar
+
+            <div class="flex items-center gap-4">
+                <a href="{{ route('students.edit', $student) }}"
+                   class="px-5 py-3 bg-school-primary text-white rounded-lg hover:bg-school-dark transition">
+                    Editar Estudante
                 </a>
-                <form action="{{ route('students.destroy', $student) }}" method="POST" class="inline">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition" 
-                            onclick="return confirm('Tem certeza que deseja eliminar este estudante?')">
-                        Eliminar
-                    </button>
-                </form>
+
+                <a href="{{ route('students.index') }}"
+                   class="px-5 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition">
+                    Voltar
+                </a>
             </div>
         </div>
     </x-slot>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- Informações Pessoais -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Informações Pessoais</h2>
-            <div class="space-y-3">
+    {{-- Informações principais --}}
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {{-- Dados do estudante --}}
+        <div class="md:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">
+                Informações do Estudante
+            </h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <p class="text-sm text-gray-600">Código</p>
-                    <p class="font-medium">{{ $student->student_code }}</p>
+                    <div class="text-sm text-gray-500">
+                        Código
+                    </div>
+
+                    <div class="font-semibold text-gray-900 mt-1">
+                        {{ $student->student_code }}
+                    </div>
                 </div>
+
                 <div>
-                    <p class="text-sm text-gray-600">Email</p>
-                    <p class="font-medium">{{ $student->email }}</p>
+                    <div class="text-sm text-gray-500">
+                        Nome
+                    </div>
+
+                    <div class="font-semibold text-gray-900 mt-1">
+                        {{ $student->name }}
+                    </div>
                 </div>
+
                 <div>
-                    <p class="text-sm text-gray-600">Turma</p>
-                    <p class="font-medium">{{ $student->class }}</p>
+                    <div class="text-sm text-gray-500">
+                        Email
+                    </div>
+
+                    <div class="font-semibold text-gray-900 mt-1">
+                        {{ $student->email }}
+                    </div>
                 </div>
+
                 <div>
-                    <p class="text-sm text-gray-600">Ano Lectivo</p>
-                    <p class="font-medium">{{ $student->academic_year }}</p>
+                    <div class="text-sm text-gray-500">
+                        Turma
+                    </div>
+
+                    <div class="font-semibold text-gray-900 mt-1">
+                        {{ $student->class }}
+                    </div>
                 </div>
+
                 <div>
-                    <p class="text-sm text-gray-600">Transporte</p>
-                    <p class="font-medium">
-                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $student->transport_required ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                            {{ $student->transport_required ? 'Sim' : 'Não' }}
-                        </span>
-                    </p>
+                    <div class="text-sm text-gray-500">
+                        Ano Lectivo
+                    </div>
+
+                    <div class="font-semibold text-gray-900 mt-1">
+                        {{ $student->academic_year }}
+                    </div>
+                </div>
+
+                <div>
+                    <div class="text-sm text-gray-500">
+                        Data de Registo
+                    </div>
+
+                    <div class="font-semibold text-gray-900 mt-1">
+                        {{ $student->created_at->format('d/m/Y') }}
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Informações do Encarregado -->
+        {{-- Encarregado --}}
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Encarregado</h2>
-            @if($student->guardian)
-            <div class="space-y-3">
+            <h2 class="text-lg font-semibold text-gray-900 mb-6">
+                Encarregado
+            </h2>
+            <div class="space-y-4">
                 <div>
-                    <p class="text-sm text-gray-600">Nome</p>
-                    <p class="font-medium">{{ $student->guardian->name }}</p>
+                    <div class="text-sm text-gray-500">
+                        Nome
+                    </div>
+                    <div class="font-semibold text-gray-900 mt-1">
+                        {{ $student->guardian->name ?? '---' }}
+                    </div>
                 </div>
+
                 <div>
-                    <p class="text-sm text-gray-600">Email</p>
-                    <p class="font-medium">{{ $student->guardian->email }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">Telefone</p>
-                    <p class="font-medium">{{ $student->guardian->phone ?? 'N/A' }}</p>
-                </div>
-                <div>
-                    <p class="text-sm text-gray-600">Relacionamento</p>
-                    <p class="font-medium">{{ $student->guardian->relationship }}</p>
+                    <div class="text-sm text-gray-500">
+                        Email
+                    </div>
+
+                    <div class="font-semibold text-gray-900 mt-1">
+                        {{ $student->guardian->email ?? '---' }}
+                    </div>
                 </div>
             </div>
-            @else
-            <p class="text-gray-500">Nenhum encarregado associado.</p>
-            @endif
+        </div>
+    </div>
+
+    {{-- Serviços --}}
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6">
+        <div class="flex items-center justify-between mb-6">
+            <div>
+                <h2 class="text-lg font-semibold text-gray-900">
+                    Serviços Associados
+                </h2>
+
+                <p class="text-sm text-gray-500">
+                    Serviços vinculados ao estudante
+                </p>
+            </div>
+
+            <div class="text-right">
+                <div class="text-sm text-gray-500">
+                    Total mensal adicional
+                </div>
+
+                <div class="text-2xl font-bold text-school-primary">
+                    {{
+                        number_format(
+                            $student->services
+                                ->where('billing_type', 'monthly')
+                                ->sum('price'), 2, ',', '.'
+                        )
+                    }} Kz
+                </div>
+            </div>
         </div>
 
-        <!-- Faturas Recentes -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-lg font-semibold text-gray-900 mb-4">Faturas Recentes</h2>
-            <div class="space-y-3">
-                @forelse($student->invoices->take(5) as $invoice)
-                <div class="flex justify-between items-center p-3 border border-gray-200 rounded-lg">
-                    <div>
-                        <p class="font-medium">#{{ $invoice->invoice_number }}</p>
-                        <p class="text-sm text-gray-600">{{ $invoice->due_date->format('d/m/Y') }}</p>
+        @if($student->services->count())
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($student->services as $service)
+                    <div class="border border-gray-200 rounded-xl p-5 hover:shadow-sm transition">
+                        <div class="flex items-start justify-between">
+                            <div>
+                                <div class="font-semibold text-gray-900">
+                                    {{ $service->name }}
+                                </div>
+                                <div class="text-sm text-gray-500 mt-1">
+                                    {{ $service->description }}
+                                </div>
+                            </div>
+
+                            @if($service->is_active)
+                                <span class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full">
+                                    Ativo
+                                </span>
+
+                            @else
+                                <span class="bg-red-100 text-red-700 text-xs px-3 py-1 rounded-full">
+                                    Inativo
+                                </span>
+                            @endif
+                        </div>
+
+                        <div class="mt-5 flex items-center justify-between">
+                            <div class="text-sm text-gray-500">
+                                {{ $service->billing_type == 'monthly'
+                                    ? 'Cobrança mensal'
+                                    : 'Cobrança única'
+                                }}
+                            </div>
+
+                            <div class="text-lg font-bold text-school-primary">
+                                {{ number_format($service->price, 2, ',', '.') }} Kz
+                            </div>
+                        </div>
                     </div>
-                    <div class="text-right">
-                        <p class="font-medium">Kz {{ number_format($invoice->total_amount, 2, ',', ' ') }}</p>
-                        <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                            {{ $invoice->status === 'paid' ? 'bg-green-100 text-green-800' : 
-                               ($invoice->status === 'overdue' ? 'bg-red-100 text-red-800' : 
-                               'bg-yellow-100 text-yellow-800') }}">
-                            {{ ucfirst($invoice->status) }}
-                        </span>
-                    </div>
+                @endforeach
+            </div>
+        @else
+            <div class="text-center py-12">
+                <div class="text-gray-400 text-lg">
+                    Nenhum serviço associado
                 </div>
-                @empty
-                <p class="text-gray-500">Nenhuma fatura encontrada.</p>
-                @endforelse
+                <p class="text-sm text-gray-500 mt-2">
+                    Este estudante não possui serviços adicionais.
+                </p>
             </div>
-            <div class="mt-4">
-                <a href="{{ route('invoices.create', ['student_id' => $student->id]) }}" class="text-school-primary hover:text-school-dark text-sm font-medium">
-                    + Adicionar Nova Fatura
-                </a>
-            </div>
-        </div>
+        @endif
     </div>
 </x-app-layout>

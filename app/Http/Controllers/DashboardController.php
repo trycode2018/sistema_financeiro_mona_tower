@@ -11,16 +11,20 @@ use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
-{
+{//totalRevenue
     public function index()
     {
         try {
             $totalStudents = Student::count();
-            $paidInvoices = Invoice::where('status', 'paid')->count();
-            $pendingInvoices = Invoice::where('status', 'pending')->count();
-            $overdueInvoices = Invoice::where('status', 'overdue')->count();
+            $paidInvoices = Invoice::where('status', 'pago')->count();
+            $partiallyPaidInvoices = Invoice::where('status', 'parcial')->count();
+            $pendingInvoices = Invoice::where('status', 'pendente')->count();
+            $overdueInvoices = Invoice::where('status', 'vencido')->count();
             $totalUsers = User::count();
-            $totalRevenue = Payment::sum('amount');
+            $totalRevenue = Payment::where('status', 'confirmed')->sum('amount');
+            $totalBilled = Invoice::sum('total_amount');
+            $totalPaid   = Invoice::sum('amount_paid');
+            $paymentRate = $totalBilled > 0 ? ($totalPaid / $totalBilled) * 100 : 0;
 
             // Revenue data for the last 6 months
             $revenueData = Payment::select(
@@ -28,6 +32,7 @@ class DashboardController extends Controller
                 DB::raw('MONTH(payment_date) as month'),
                 DB::raw('SUM(amount) as total')
             )
+            ->where('status', 'confirmed')
             ->where('payment_date', '>=', Carbon::now()->subMonths(6))
             ->groupBy('year', 'month')
             ->orderBy('year', 'desc')
@@ -55,25 +60,31 @@ class DashboardController extends Controller
 
             $paymentChartData = [
                 (int) $paidInvoices,
+                (int) $partiallyPaidInvoices,
                 (int) $pendingInvoices,
                 (int) $overdueInvoices,
             ];
 
             $recentPayments = Payment::with(['invoice.student'])
+                ->where('status', 'confirmed')
                 ->orderBy('payment_date', 'desc')
-                ->limit(5)
+                ->limit(4)
                 ->get();
 
             return view('dashboard', compact(
                 'totalStudents',
                 'paidInvoices',
+                'partiallyPaidInvoices',
                 'pendingInvoices',
                 'overdueInvoices',
                 'totalUsers',
                 'totalRevenue',
                 'revenueChart',
                 'paymentChartData',
-                'recentPayments'
+                'recentPayments',
+                'totalBilled',  
+                'totalPaid',
+                'paymentRate'
             ));
 
         } catch (\Exception $e) {
@@ -81,12 +92,13 @@ class DashboardController extends Controller
             return view('dashboard', [
                 'totalStudents' => 0,
                 'paidInvoices' => 0,
+                'partiallyPaidInvoices' => 0,
                 'pendingInvoices' => 0,
                 'overdueInvoices' => 0,
                 'totalUsers' => 0,
                 'totalRevenue' => 0,
                 'revenueChart' => ['labels' => [], 'data' => []],
-                'paymentChartData' => [0, 0, 0],
+                'paymentChartData' => [0, 0, 0, 0],
                 'recentPayments' => collect(),
             ]);
         }

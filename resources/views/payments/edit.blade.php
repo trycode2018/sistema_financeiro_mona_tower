@@ -5,6 +5,9 @@
                 <h1 class="text-2xl font-bold text-gray-900">Editar Pagamento</h1>
                 <p class="text-gray-600">Atualizar informações do pagamento</p>
             </div>
+            <a href="{{ route('payments.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1">
+                    ← Voltar à lista
+            </a>
         </div>
     </x-slot>
 

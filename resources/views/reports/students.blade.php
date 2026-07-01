@@ -5,9 +5,18 @@
                 <h1 class="text-2xl font-bold text-gray-900">Relatório de Estudantes</h1>
                 <p class="text-gray-600">Estatísticas e informações dos estudantes</p>
             </div>
+            <div class="flex items-center space-x-3">
+                <button type="button" onclick="exportReport()" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    Exportar Relatório
+                </button>
+            </div>
         </div>
     </x-slot>
-
+    
     <div class="space-y-6">
         <!-- Filtros -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -115,7 +124,7 @@
                                 Kz {{ number_format($student->invoices->sum('amount_paid'), 2, ',', ' ') }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600">
-                                Kz {{ number_format($student->invoices->whereIn('status', ['pending', 'overdue'])->sum('balance'), 2, ',', ' ') }}
+                                Kz {{ number_format($student->invoices->whereIn('status', ['pendente', 'overdue'])->sum('balance'), 2, ',', ' ') }}
                             </td>
                         </tr>
                         @endforeach
@@ -124,4 +133,29 @@
             </div>
         </div>
     </div>
+
+    <script>
+        async function exportReport() {
+
+            const params = new URLSearchParams(window.location.search);
+
+            const response = await fetch(
+                "{{ route('reports.students.export') }}?" + params.toString(),
+                {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            // abre numa nova aba sem sair da página atual
+            const newWindow = window.open('', '_blank');
+
+            newWindow.document.open();
+            newWindow.document.write(data.html);
+            newWindow.document.close();
+        }
+    </script>
 </x-app-layout>

@@ -6,16 +6,48 @@ use App\Models\Invoice;
 use App\Models\Student;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Models\User;
+use App\Services\BillingService;
+use App\Notifications\InvoiceCreate;
+use App\Notifications\InvoiceReminder; 
+use Illuminate\Support\Facades\Notification;
 
 class InvoiceController extends Controller
 {
-    public function index()
+    public function handleMassAction(Request $request, BillingService $billingService)
     {
+        // Disparo manual das notificações por e-mail
+        if ($request->has('enviar_notificacoes')) {
+            \Artisan::call('invoices:send-reminders');
+            return back()->with('success', 'Notificações por e-mail enviadas manualmente!');
+        }
+
+        // Se clicou no botão de processar faturas agora
+        if ($request->has('processar_agora')) {
+            $total = $billingService->processarCobrancaEmMassa();
+            return back()->with('success', "Sucesso! $total novas faturas foram geradas.");
+        }
+
+        // Se clicou no toggle de ativar/desativar
+        $novoStatus = $request->has('status_toggle'); 
+        $billingService->alternarStatusCobranca($novoStatus);
+
+        return back()->with('success', 'Configuração de faturamento atualizada.');
+    }
+
+    public function index(BillingService $billingService)
+    {
+        // Busca as faturas (ajuste conforme sua lógica de paginação)
+        $invoices = Invoice::with('student')->latest();
+
+        // BUSCA O STATUS DO BOTÃO NO SERVICE
+        $statusAtivo = $billingService->isCobrancaAtiva();
+
         $invoices = Invoice::with(['student'])
             ->orderBy('created_at', 'desc')
-            ->paginate(10);
+            ->paginate(6);
 
-        return view('invoices.index', compact('invoices'));
+        return view('invoices.index', compact('invoices', 'statusAtivo'));
     }
 
     public function create()
@@ -55,9 +87,13 @@ class InvoiceController extends Controller
             'issue_date' => now(),
             'total_amount' => $request->total_amount,
             'description' => $request->description,
-            'status' => 'pending',
+            'status' => 'pendente',
             'amount_paid' => 0,
         ]);
+
+        // Notificar todos os Administradores e equipe financeira sobre a nova fatura criada
+        $users = User::whereIn('role', ['admin', 'financeiro'])->get();
+        Notification::send($users, new InvoiceCreate($invoice));
 
         return redirect()->route('invoices.show', $invoice)
             ->with('success', 'Fatura criada com sucesso.');
@@ -66,7 +102,11 @@ class InvoiceController extends Controller
     public function show(Invoice $invoice)
     {
         // Carregar as relações necessárias
-        $invoice->load(['student.guardian', 'payments']);
+        $invoice->load([
+            'student.guardian',
+            'payments',
+            'items'
+        ]);
         
         // Verificar se o estudante existe
         if (!$invoice->student) {

@@ -12,10 +12,25 @@ class AdminUserSeeder extends Seeder
     {
         User::create([
             'name' => 'Administrador',
-            'email' => 'admin@monatower.edu.mz',
-            'password' => Hash::make('password123'),
+            'email' => 'admin@gmail.com',
+            'password' => Hash::make('12345678'),
             'role' => 'admin',
             'phone' => '+244 927 476 913',
+        ]);/*
+        User::create([
+            'name' => 'Secretária',
+            'email' => 'secretaria@gmail.com',
+            'password' => Hash::make('12345678'),
+            'role' => 'secretaria',
+            'phone' => '+244 927 476 913',
         ]);
+        User::create([
+            'name' => 'Financeiro',
+            'email' => 'financeiro@gmail.com',
+            'password' => Hash::make('12345678'),
+            'role' => 'financeiro',
+            'phone' => '+244 927 476 913',
+        ]);*/
+
     }
 }

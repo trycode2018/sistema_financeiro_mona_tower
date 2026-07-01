@@ -5,6 +5,15 @@
                 <h1 class="text-2xl font-bold text-gray-900">Relatório de Faturas</h1>
                 <p class="text-gray-600">Análise e estatísticas das faturas</p>
             </div>
+            <div class="flex items-center space-x-3">
+                <button type="button" onclick="exportReport()" class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-lg font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                        </path>
+                    </svg>
+                    Exportar Relatório
+                </button>
+            </div>
         </div>
     </x-slot>
 
@@ -29,9 +38,10 @@
                         <select name="status" id="status"
                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-school-primary focus:border-school-primary transition">
                             <option value="">Todos os Status</option>
-                            <option value="paid" {{ request('status') == 'paid' ? 'selected' : '' }}>Pagas</option>
-                            <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pendentes</option>
-                            <option value="overdue" {{ request('status') == 'overdue' ? 'selected' : '' }}>Vencidas</option>
+                            <option value="pago" {{ request('status') == 'pago' ? 'selected' : '' }}>Pagas</option>
+                            <option value="pendente" {{ request('status') == 'pendente' ? 'selected' : '' }}>Pendentes</option>
+                            <option value="vencido" {{ request('status') == 'vencido' ? 'selected' : '' }}>Vencidas</option>
+                            <option value="parcial" {{ request('status') == 'parcial' ? 'selected' : '' }}>Parciais</option>
                         </select>
                     </div>
                     <div class="flex items-end">
@@ -78,22 +88,25 @@
                 <div class="space-y-4">
                     @php
                         $statusColors = [
-                            'paid' => 'bg-green-100 text-green-800',
-                            'pending' => 'bg-yellow-100 text-yellow-800', 
-                            'overdue' => 'bg-red-100 text-red-800'
+                            'pago'    => 'bg-green-100 text-green-800',
+                            'pendente' => 'bg-yellow-100 text-yellow-800', 
+                            'vencido'  => 'bg-red-100 text-red-800',
+                            'parcial'  => 'bg-purple-100 text-purple-800'
                         ];
                         
                         $statusLabels = [
-                            'paid' => 'Pagas',
-                            'pending' => 'Pendentes',
-                            'overdue' => 'Vencidas'
+                            'pago'    => 'Pagas',
+                            'pendente' => 'Pendentes',
+                            'vencido'  => 'Vencidas',
+                            'parcial'  => 'Parciais'
                         ];
                     @endphp
                     
                     @foreach($statusDistribution as $status => $count)
+                    @if($count > 0)
                     <div class="flex items-center justify-between">
-                        <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full {{ $statusColors[$status] }}">
-                            {{ $statusLabels[$status] }}
+                        <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full {{ $statusColors[$status] ?? 'bg-gray-100 text-gray-800' }}">
+                            {{ $statusLabels[$status] ?? ucfirst($status) }}
                         </span>
                         <div class="flex items-center space-x-4">
                             <span class="text-sm font-medium text-gray-900">{{ $count }}</span>
@@ -102,6 +115,7 @@
                             </span>
                         </div>
                     </div>
+                    @endif
                     @endforeach
                 </div>
             </div>
@@ -183,10 +197,13 @@
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                    {{ $invoice->status === 'paid' ? 'bg-green-100 text-green-800' : 
-                                       ($invoice->status === 'overdue' ? 'bg-red-100 text-red-800' : 
-                                       'bg-yellow-100 text-yellow-800') }}">
-                                    {{ ucfirst($invoice->status) }}
+                                    {{ $invoice->status === 'pago' ? 'bg-green-100 text-green-800' : 
+                                       ($invoice->status === 'vencido' ? 'bg-red-100 text-red-800' : 
+                                       ($invoice->status === 'parcial' ? 'bg-purple-100 text-purple-800' :
+                                       'bg-yellow-100 text-yellow-800')) }}">
+                                    {{ $invoice->status === 'pago' ? 'Paga' : 
+                                       ($invoice->status === 'parcial' ? 'Parcial' : 
+                                       ucfirst($invoice->status)) }}
                                 </span>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
@@ -213,4 +230,29 @@
             @endif
         </div>
     </div>
+
+    <script>
+        async function exportReport() {
+
+            const params = new URLSearchParams(window.location.search);
+
+            const response = await fetch(
+                "{{ route('reports.invoices.export') }}?" + params.toString(),
+                {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            // abre numa nova aba sem sair da página atual
+            const newWindow = window.open('', '_blank');
+
+            newWindow.document.open();
+            newWindow.document.write(data.html);
+            newWindow.document.close();
+        }
+    </script>
 </x-app-layout>

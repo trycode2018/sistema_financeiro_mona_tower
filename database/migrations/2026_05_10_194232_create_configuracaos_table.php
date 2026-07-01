@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('services', function (Blueprint $table) {
+        Schema::create('configuracaos', function (Blueprint $table) {
             $table->id();
+            $table->string('chave')->unique(); // ex: 'cobranca_massa_status'
+            $table->text('valor')->nullable();  // ex: '1' ou '0'
             $table->timestamps();
         });
     }
@@ -22,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('services');
+        Schema::dropIfExists('configuracaos');
     }
 };

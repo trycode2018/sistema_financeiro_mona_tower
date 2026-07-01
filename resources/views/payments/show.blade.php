@@ -81,5 +81,8 @@
             <h2 class="text-lg font-semibold text-gray-900 mb-4">Notas</h2>
             <p class="text-gray-700">{{ $payment->notes ?? 'Nenhuma nota fornecida.' }}</p>
         </div>
+        <a href="{{ route('payments.index') }}" class="text-sm font-medium text-gray-600 hover:text-gray-900 flex items-center gap-1">
+            ← Voltar à lista
+        </a>
     </div>
 </x-app-layout>

@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Traits\HasAuditLog;
 
 class Invoice extends Model
 {
-    use HasFactory;
+    use HasFactory, HasAuditLog;
 
     protected $fillable = [
         'invoice_number',
@@ -29,6 +30,11 @@ class Invoice extends Model
         'amount_paid' => 'decimal:2',
     ];
 
+    public function items(): HasMany
+    {
+        return $this->hasMany(InvoiceItem::class);
+    }
+
     public function student(): BelongsTo
     {
         return $this->belongsTo(Student::class);
@@ -44,19 +50,34 @@ class Invoice extends Model
         return $this->total_amount - $this->amount_paid;
     }
 
+    // Método para verificar se está vencida
     public function isOverdue()
     {
-        return $this->due_date < now() && $this->status === 'pending';
+        return $this->due_date < now() && 
+               $this->amount_paid < $this->total_amount &&
+               !in_array($this->status, ['pago', 'aguardando_confirmacao']);
     }
 
-    // Atualizar o status automaticamente
-    protected static function boot()
+    protected static function booted()
     {
-        parent::boot();
-
         static::saving(function ($invoice) {
-            if ($invoice->isOverdue()) {
-                $invoice->status = 'overdue';
+            // Atualizar status baseado em pagamentos
+            $totalConfirmed = $invoice->payments()
+                ->where('status', 'confirmed')
+                ->sum('amount');
+            
+            $hasPending = $invoice->payments()
+                ->where('status', 'pending')
+                ->exists();
+            
+            if ($totalConfirmed >= $invoice->total_amount) {
+                $invoice->status = 'pago';
+            } elseif ($hasPending) {
+                $invoice->status = 'aguardando_confirmacao';
+            } elseif ($totalConfirmed > 0) {
+                $invoice->status = 'parcial';
+            } elseif ($invoice->due_date < now() && $totalConfirmed == 0) {
+                $invoice->status = 'vencido'; // Mudado de 'overdue' para 'vencido'
             }
         });
     }

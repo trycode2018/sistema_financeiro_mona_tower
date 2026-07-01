@@ -14,7 +14,12 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->string('phone');
             $table->string('address');
-            $table->string('relationship'); // pai, mãe, tutor, etc.
+            $table->string('relationship');
+
+            // auditoria leve (opcional mas útil)
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('updated_by')->nullable()->constrained('users')->nullOnDelete();
+
             $table->timestamps();
         });
     }

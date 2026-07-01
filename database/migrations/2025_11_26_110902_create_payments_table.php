@@ -16,6 +16,8 @@ return new class extends Migration
             $table->enum('payment_method', ['cash', 'bank_transfer', 'card', 'mobile_money']);
             $table->string('reference')->nullable();
             $table->text('notes')->nullable();
+            $table->foreignId('created_by')->nullable()->constrained('users')->nullOnDelete();
+            $table->foreignId('confirmed_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamps();
         });
     }
